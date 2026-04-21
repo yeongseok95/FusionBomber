@@ -25,13 +25,48 @@ public class NetworkGameManager : MonoBehaviour, INetworkRunnerCallbacks
         });
     }
 
+    private List<PlayerController> _players = new List<PlayerController>();
+    private bool _gameEnded = false;
+
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         if (runner.IsServer)
         {
-            // 1vs1 위치 지정 (간단한 예시)
             Vector3 spawnPosition = (player.RawEncoded % 2 == 0) ? new Vector3(1, 0, 1) : new Vector3(9, 0, 9);
-            runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
+            var playerObj = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
+            _players.Add(playerObj.GetComponent<PlayerController>());
+        }
+    }
+
+    private void Update()
+    {
+        if (_runner != null && _runner.IsServer && !_gameEnded)
+        {
+            CheckWinCondition();
+        }
+    }
+
+    private void CheckWinCondition()
+    {
+        if (_players.Count < 2) return;
+
+        PlayerController winner = null;
+        int aliveCount = 0;
+
+        foreach (var p in _players)
+        {
+            if (p != null && !p.IsDead)
+            {
+                aliveCount++;
+                winner = p;
+            }
+        }
+
+        if (aliveCount <= 1)
+        {
+            _gameEnded = true;
+            if (winner != null) winner.ShowWinUI();
+            Debug.Log("Game Over!");
         }
     }
 

@@ -17,10 +17,12 @@ public class PlayerController : NetworkBehaviour
 
     private Vector3 _targetPosition;
     private bool _isMoving;
+    private SimpleSpriteAnimator _animator;
 
     public override void Spawned()
     {
         _targetPosition = transform.position;
+        _animator = GetComponent<SimpleSpriteAnimator>();
         if (Object.HasStateAuthority)
         {
             BombPower = 1;
@@ -44,6 +46,7 @@ public class PlayerController : NetworkBehaviour
                 {
                     _targetPosition = transform.position + moveDir;
                     _isMoving = true;
+                    if (_animator != null) _animator.enabled = true;
                 }
             }
 
@@ -61,6 +64,7 @@ public class PlayerController : NetworkBehaviour
             {
                 transform.position = _targetPosition;
                 _isMoving = false;
+                if (_animator != null) _animator.enabled = false;
             }
         }
     }

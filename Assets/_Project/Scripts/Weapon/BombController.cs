@@ -10,6 +10,7 @@ public class BombController : NetworkBehaviour
     [Networked] private TickTimer fuseTimer { get; set; }
     private int _currentPower;
     private PlayerController _owner;
+    private SimpleSpriteAnimator _animator;
 
     public void Setup(int power, PlayerController owner)
     {
@@ -19,6 +20,7 @@ public class BombController : NetworkBehaviour
 
     public override void Spawned()
     {
+        _animator = GetComponent<SimpleSpriteAnimator>();
         if (Object.HasStateAuthority)
         {
             fuseTimer = TickTimer.CreateFromSeconds(Runner, fuseTime);
